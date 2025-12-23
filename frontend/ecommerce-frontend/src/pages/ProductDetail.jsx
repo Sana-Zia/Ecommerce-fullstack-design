@@ -8,10 +8,13 @@ import { useCart } from '../context/CartContext';
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
   const [activeTab, setActiveTab] = useState('Description');
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
+
+  const isAlreadyInCart = cart.some(item => item.id === parseInt(id));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -25,6 +28,11 @@ const ProductDetail = () => {
       .catch(() => setLoading(false));
   }, [id]);
 
+  const handleQuantity = (type) => {
+    if (type === 'inc') setQuantity(q => q + 1);
+    if (type === 'dec' && quantity > 1) setQuantity(q => q - 1);
+  };
+
   if (loading) return <div className="p-20 text-center text-blue-600 font-bold">Loading...</div>;
   if (!product) return <div className="p-20 text-center text-red-600">Product not found.</div>;
 
@@ -35,7 +43,7 @@ const ProductDetail = () => {
         {/* BREADCRUMBS */}
         <nav className="flex items-center gap-2 py-4 text-[#8B96A5] text-[14px]">
           <Link to="/" className="hover:text-blue-600">Home</Link> <ChevronRight size={14} />
-          <span>Electronics</span> <ChevronRight size={14} />
+          <Link to="/products" className="hover:text-blue-600">Electronics</Link> <ChevronRight size={14} />
           <span className="text-gray-500 font-medium">{product.name}</span>
         </nav>
 
@@ -74,11 +82,11 @@ const ProductDetail = () => {
               <span className="text-[#8B96A5] flex items-center gap-1.5"><ShoppingBasket size={16}/> 154 sold</span>
             </div>
 
-            {/* Tiered Pricing Box (From web-detail.jpg) */}
+            {/* Price Box */}
             <div className="bg-[#FFF0DF] p-3 md:p-4 rounded-md flex items-center justify-between mb-6 border-l-4 border-orange-400">
                <div className="flex-1 px-4 text-center border-r border-orange-200 first:pl-0">
                   <p className="text-[#FA3434] text-lg font-bold">${product.price}</p>
-                  <p className="text-[12px] text-gray-500">50-100 pcs</p>
+                  <p className="text-[12px] text-gray-500">Retail Price</p>
                </div>
                <div className="flex-1 px-4 text-center border-r border-orange-200">
                   <p className="text-[#1C1C1C] text-lg font-bold">${(product.price * 0.9).toFixed(2)}</p>
@@ -86,22 +94,47 @@ const ProductDetail = () => {
                </div>
                <div className="flex-1 px-4 text-center last:border-0 last:pr-0">
                   <p className="text-[#1C1C1C] text-lg font-bold">${(product.price * 0.8).toFixed(2)}</p>
-                  <p className="text-[12px] text-gray-500">700+ pcs</p>
+                  <p className="text-[12px] text-gray-500">Bulk Offer</p>
                </div>
             </div>
 
-            {/* Quick Specs Table */}
+            {/* QUANTITY AND ADD TO CART SECTION */}
+            <div className="flex flex-wrap items-center gap-4 mb-8">
+              <div className="flex items-center border border-gray-300 rounded-md">
+                <button 
+                  onClick={() => handleQuantity('dec')}
+                  className="p-2 hover:bg-gray-100 border-r border-gray-300 transition-colors"
+                >
+                  <Minus size={18} />
+                </button>
+                <span className="px-6 font-bold">{quantity}</span>
+                <button 
+                  onClick={() => handleQuantity('inc')}
+                  className="p-2 hover:bg-gray-100 border-l border-gray-300 transition-colors"
+                >
+                  <Plus size={18} />
+                </button>
+              </div>
+
+              <button 
+                onClick={() => addToCart(product, quantity)}
+                className={`flex-grow md:flex-initial flex items-center justify-center gap-2 px-8 py-2.5 rounded-md font-bold text-white transition-all transform active:scale-95 ${
+                  isAlreadyInCart ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-200'
+                }`}
+              >
+                {isAlreadyInCart ? (
+                  <><Check size={20} /> Added to Cart</>
+                ) : (
+                  <><ShoppingCart size={20} /> Add to Cart</>
+                )}
+              </button>
+            </div>
+
             <div className="space-y-4 text-[14px] border-b pb-6">
               <div className="flex"><span className="w-32 text-[#8B96A5]">Price:</span><span className="text-[#505050]">Negotiable</span></div>
               <div className="flex"><span className="w-32 text-[#8B96A5]">Type:</span><span className="text-[#505050]">Classic Series</span></div>
               <div className="flex"><span className="w-32 text-[#8B96A5]">Material:</span><span className="text-[#505050]">Premium Components</span></div>
               <div className="flex"><span className="w-32 text-[#8B96A5]">Design:</span><span className="text-[#505050]">Modern sleek</span></div>
-            </div>
-
-            <div className="mt-4 space-y-4">
-               <div className="flex text-sm"><span className="w-32 text-[#8B96A5]">Customization:</span><span className="text-[#8B96A5]">Customized logo and design</span></div>
-               <div className="flex text-sm"><span className="w-32 text-[#8B96A5]">Protection:</span><span className="text-[#8B96A5]">Refund Policy</span></div>
-               <div className="flex text-sm"><span className="w-32 text-[#8B96A5]">Warranty:</span><span className="text-[#8B96A5]">2 years full warranty</span></div>
             </div>
           </div>
 
@@ -129,9 +162,8 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* --- MIDDLE SECTION: DESCRIPTION & SIDEBAR --- */}
+        {/* --- DESCRIPTION TABS --- */}
         <div className="flex flex-col lg:flex-row gap-6 mb-10">
-          {/* Main Description Tabs */}
           <div className="flex-grow bg-white border border-gray-200 rounded-md shadow-sm">
             <div className="flex border-b border-gray-200 px-2 overflow-x-auto no-scrollbar">
               {['Description', 'Reviews', 'Shipping', 'About seller'].map(tab => (
@@ -156,18 +188,9 @@ const ProductDetail = () => {
                   <tr className="bg-gray-50"><td className="p-3 border-r text-gray-400">Memory</td><td className="p-3">36GB RAM</td></tr>
                 </tbody>
               </table>
-
-              <div className="space-y-3">
-                 {['Some great feature name here', 'Lorem ipsum dolor sit amet, consectetur', 'Duis aute irure dolor in reprehenderit', 'Some great feature name here'].map((item, i) => (
-                   <div key={i} className="flex items-center gap-3 text-gray-500 text-[15px]">
-                      <Check size={16} className="text-gray-400" /> <span>{item}</span>
-                   </div>
-                 ))}
-              </div>
             </div>
           </div>
 
-          {/* Sidebar: You may like */}
           <div className="w-full lg:w-72 bg-white border border-gray-200 rounded-md p-4 shadow-sm h-fit">
             <h4 className="font-bold mb-5 text-[15px]">You may like</h4>
             <div className="space-y-5">
@@ -177,7 +200,7 @@ const ProductDetail = () => {
                     <img src={product.image_url} alt="" className="max-h-full" />
                   </div>
                   <div>
-                    <p className="text-[14px] text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-600">Men Blazers Sets Elegant Formal</p>
+                    <p className="text-[14px] text-gray-800 leading-tight line-clamp-2 group-hover:text-blue-600">Premium Tech Accessory</p>
                     <p className="text-[13px] text-gray-400 mt-1">$7.00 - $99.50</p>
                   </div>
                 </div>
@@ -186,11 +209,11 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* --- RELATED PRODUCTS GRID --- */}
+        {/* RELATED PRODUCTS */}
         <div className="mb-10 bg-white border border-gray-200 rounded-md p-6 shadow-sm">
            <h3 className="text-lg font-bold mb-6">Related products</h3>
            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {[...Array(6)].map((_, i) => (
+             {[...Array(6)].map((_, i) => (
                 <div key={i} className="cursor-pointer group">
                    <div className="aspect-square bg-gray-50 rounded-md mb-3 flex items-center justify-center p-4 border border-transparent group-hover:border-gray-200">
                       <img src={product.image_url} alt="" className="max-h-full group-hover:scale-110 transition-transform" />
@@ -198,11 +221,11 @@ const ProductDetail = () => {
                    <p className="text-[14px] text-gray-600 line-clamp-2 mb-1">Xiaomi Redmi 8 Original</p>
                    <p className="text-[14px] text-gray-400 font-medium">$32.00-$40.00</p>
                 </div>
-              ))}
+             ))}
            </div>
         </div>
 
-        {/* --- BRANDED PROMO BANNER (AS PROVIDED) --- */}
+        {/* ---  BANNER --- */}
         <div className="bg-[#1C1C1C] rounded-lg p-8 md:p-12 text-white flex flex-col md:flex-row justify-between items-center relative overflow-hidden shadow-lg border-b-4 border-red-600">
           <div className="relative z-10 text-center md:text-left">
             <h3 className="text-2xl md:text-3xl font-bold mb-2">Exclusive Photography Bundle</h3>

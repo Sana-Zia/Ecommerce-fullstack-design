@@ -62,6 +62,7 @@ const Home = () => {
               {categories.map((cat, i) => (
                 <li
                   key={i}
+                  onClick={() => navigate(`/products?search=${cat}`)} // Added category filter
                   className={`px-3 py-1.5 rounded-md cursor-pointer text-sm text-gray-600 hover:bg-[#E5F1FF] hover:text-black transition-colors ${i === 0 ? 'bg-[#E5F1FF] font-semibold text-black' : ''}`}
                 >
                   {cat}
@@ -81,7 +82,7 @@ const Home = () => {
               <h3 className="text-xl text-gray-800">Latest trending</h3>
               <h2 className="text-4xl font-bold text-gray-900 mb-6 leading-tight">Electronic items</h2>
               <button 
-                onClick={() => navigate('/products')}
+                onClick={() => navigate('/products')} // Navigates to full product list
                 className="bg-white text-gray-900 px-6 py-2 rounded-md font-bold hover:bg-gray-100 shadow-md transition-colors"
               >
                 Source now
@@ -121,7 +122,11 @@ const Home = () => {
           </div>
           <div className="flex-grow grid grid-cols-5">
             {dealProducts.map((item, i) => (
-              <div key={i} className="p-4 border-r border-gray-100 last:border-r-0 flex flex-col items-center justify-center hover:bg-gray-50 cursor-pointer transition-colors">
+              <div 
+                key={i} 
+                onClick={() => navigate(`/products?search=${item.name}`)} // Search by deal name
+                className="p-4 border-r border-gray-100 last:border-r-0 flex flex-col items-center justify-center hover:bg-gray-50 cursor-pointer transition-colors"
+              >
                 <div className="h-32 w-32 flex items-center justify-center text-5xl">{item.img}</div>
                 <p className="text-sm mt-3 text-gray-700">{item.name}</p>
                 <span className="bg-[#FFE3E3] text-[#EB001B] px-3 py-1 rounded-full text-xs font-bold mt-2">{item.discount}</span>
@@ -130,7 +135,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* --- SECTION 3: HOME & ELECTRONICS GRID (Mapped) --- */}
+        {/* SECTION 3: HOME & ELECTRONICS GRID (Mapped) */}
         {gridSections.map((sec, idx) => (
           <div key={idx} className="mt-6 bg-white border border-gray-200 rounded-lg flex overflow-hidden shadow-sm">
             <div className={`${sec.bg} bg-cover bg-center w-[280px] p-6 relative flex flex-col`}>
@@ -138,7 +143,7 @@ const Home = () => {
               <div className="relative z-10">
                 <h4 className="font-bold text-lg mb-4 w-32 leading-tight text-gray-900">{sec.title}</h4>
                 <button 
-                  onClick={() => navigate('/products')}
+                  onClick={() => navigate('/products')} // Direct to products page
                   className="bg-white px-4 py-2 rounded-md text-sm font-bold shadow-md hover:bg-gray-50 transition-colors"
                 >
                   Source now
@@ -147,7 +152,11 @@ const Home = () => {
             </div>
             <div className="flex-grow grid grid-cols-4">
               {sec.products.map((prod, i) => (
-                <div key={i} className="p-4 border-r border-b border-gray-100 flex justify-between items-start hover:bg-gray-50 cursor-pointer group">
+                <div 
+                   key={i} 
+                   onClick={() => navigate(`/products?search=${sec.title}`)} // Filter by section theme
+                   className="p-4 border-r border-b border-gray-100 flex justify-between items-start hover:bg-gray-50 cursor-pointer group"
+                >
                   <div className="z-10">
                     <p className="text-sm font-medium text-gray-800">{prod.name}</p>
                     <p className="text-xs text-gray-400 mt-1">From <br /> USD {prod.price}</p>
@@ -192,7 +201,7 @@ const Home = () => {
           <h3 className="text-2xl font-bold mb-6 text-gray-800">Recommended items</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {recommendedItems.map((item, i) => (
-              <div key={i} className="bg-white border border-gray-200 rounded-md p-4 hover:shadow-md cursor-pointer transition-all">
+              <div key={i} onClick={() => navigate('/products')} className="bg-white border border-gray-200 rounded-md p-4 hover:shadow-md cursor-pointer transition-all">
                 <div className="h-40 flex items-center justify-center text-6xl bg-gray-50 rounded-md mb-4">{item.img}</div>
                 <p className="font-bold text-gray-900 text-lg">{item.price}</p>
                 <p className="text-sm text-gray-500 mt-2 line-clamp-2">{item.desc}</p>

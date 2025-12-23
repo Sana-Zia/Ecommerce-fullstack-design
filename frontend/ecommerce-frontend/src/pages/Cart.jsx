@@ -1,14 +1,14 @@
-import React, { useMemo } from 'react'; // Removed useState because we use Context now
-import { Link } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, ShieldCheck, MessageSquare, 
   Truck, ShoppingCart, Trash2, Heart
 } from 'lucide-react';
-import { useCart } from '../context/CartContext'; // 1. Import Context Hook
+import { useCart } from '../context/CartContext'; 
 
 const Cart = () => {
-  // 2. Use global state and functions from Context
-  const { cart, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { cart, removeFromCart, updateQty, clearCart } = useCart();
+  const navigate = useNavigate();
 
   const savedItems = [
     { id: 101, name: 'GoPro HERO6 4K Action Camera - Black', price: 99.50, img: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=200' },
@@ -17,9 +17,9 @@ const Cart = () => {
     { id: 104, name: 'Laptop Ultrabook 15" M2 Chip', price: 99.50, img: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200' },
   ];
 
-  // --- HANDLERS (Updated to use Context functions) ---
+  // --- HANDLERS ---
   const handleQtyChange = (id, newQty) => {
-    updateQuantity(id, parseInt(newQty));
+    updateQty(id, parseInt(newQty));
   };
 
   const removeItem = (id) => {
@@ -32,8 +32,8 @@ const Cart = () => {
     }
   };
 
-  // --- CALCULATIONS (Updated to use 'cart' from context) ---
-  const subtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0), [cart]);
+  // --- CALCULATIONS ---
+  const subtotal = useMemo(() => cart.reduce((acc, item) => acc + (item.price * item.qty), 0), [cart]);
   const discount = cart.length > 0 ? 60.00 : 0;
   const tax = cart.length > 0 ? 14.00 : 0;
   const total = Math.max(0, subtotal - discount + tax);
@@ -53,8 +53,13 @@ const Cart = () => {
                   cart.map((item, index) => (
                     <div key={item.id} className={`flex flex-col sm:flex-row gap-4 py-4 ${index !== 0 ? 'border-t border-gray-100' : ''}`}>
                       <div className="w-full sm:w-24 h-40 sm:h-24 bg-[#F7F7F7] border border-gray-200 rounded-lg flex items-center justify-center p-2 shrink-0">
-                        {/* Note: item.img comes from our Context/ProductDetail mapping */}
-                        <div className="text-4xl">{item.img.length < 5 ? item.img : <img src={item.img} alt="" className="max-h-full object-contain mix-blend-multiply" />}</div>
+                        <div className="text-4xl">
+                          {item.image ? (
+                            <img src={item.image} alt="" className="max-h-full object-contain mix-blend-multiply" />
+                          ) : (
+                            <span className="text-gray-300">📦</span>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex-1 flex flex-col justify-between">
@@ -66,7 +71,7 @@ const Cart = () => {
                             <p className="mt-1 text-xs md:text-sm text-gray-400">Seller: <span className="text-gray-500">{item.seller || 'Artel Market'}</span></p>
                           </div>
                           <span className="font-bold text-gray-800 text-sm md:text-base whitespace-nowrap">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            ${(item.price * item.qty).toFixed(2)}
                           </span>
                         </div>
 
@@ -85,7 +90,7 @@ const Cart = () => {
                           
                           <div className="w-full sm:w-28">
                             <select 
-                              value={item.quantity}
+                              value={item.qty}
                               onChange={(e) => handleQtyChange(item.id, e.target.value)}
                               className="w-full border border-gray-300 rounded-md py-1.5 px-3 text-sm bg-white outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
                             >
@@ -157,6 +162,7 @@ const Cart = () => {
                 <span className="text-xl md:text-2xl">${total.toFixed(2)}</span>
               </div>
               <button 
+                onClick={() => navigate('/checkout')}
                 disabled={cart.length === 0}
                 className="w-full bg-[#00B517] text-white py-4 rounded-lg font-bold text-lg hover:bg-green-600 transition-all shadow-md active:scale-[0.98] disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
@@ -172,7 +178,7 @@ const Cart = () => {
           </aside>
         </div>
 
-        {/* SAVED FOR LATER SECTION (UI Only) */}
+        {/* SAVED FOR LATER SECTION  */}
         <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6 mt-8 shadow-sm">
           <h2 className="text-lg font-bold text-gray-800 mb-6">Saved for later</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
