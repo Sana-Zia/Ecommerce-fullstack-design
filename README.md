@@ -66,7 +66,7 @@ This project utilizes a **Monorepo** structure to ensure frontend and backend ve
 │   ├── products/         # Product models, Views, and Serializers
 │   └── core/             # Project Settings & API Routing
 └── requirements.txt      # Backend dependencies
-
+```
 ## 🚀 **Future Roadmap**
 
 - [ ] **Search & Filter:** Implementation of fuzzy search and price/category filtering.
