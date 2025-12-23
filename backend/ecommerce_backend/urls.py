@@ -27,7 +27,8 @@ def home_view(request):
     })
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # Fixed this line
+    path('admin/', admin.site.urls), 
     path('api/products/', include('products.urls')),
     path('', home_view),
+    path('api/users/', include('users.urls')),
 ]

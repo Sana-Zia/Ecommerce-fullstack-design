@@ -28,17 +28,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     
-    # Your Feature Apps
+    # Feature Apps
     'products',
+    'users',
 ]
 
 MIDDLEWARE = [
-    # CORS MUST be at the top
-    'corsheaders.middleware.CorsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'django.middleware.common.CommonMiddleware', 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -68,7 +67,7 @@ WSGI_APPLICATION = 'ecommerce_backend.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Debug print to see if Django actually sees your URL
+
 print(f"DEBUG: DATABASE_URL is {'found' if DATABASE_URL else 'NOT FOUND'}")
 
 if DATABASE_URL:
@@ -100,6 +99,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -108,3 +113,5 @@ USE_TZ = True
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True  
+AUTH_USER_MODEL = 'users.User'
